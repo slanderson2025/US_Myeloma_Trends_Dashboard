@@ -1,0 +1,337 @@
+---
+title: "U.S. Myeloma Trends Report"
+authors: "Anne-Marie Feeney, Stephanie Leininger-Anderson"
+date: "`r Sys.Date()`"
+output: pdf_document
+params: 
+  date: Sys.date()
+  selected_years: NULL
+  selected_agegroups: NULL
+  log_scale: FALSE
+  hist_view: "overlay"
+  filtered_data: NULL
+  box_summary_table: NULL
+  selected_states: NULL
+  state_data: NULL
+  state_plot_path: NULL
+  shapiro_results: NULL
+  line_age: NA
+  gg_line_age_plot_path: NULL
+  gg_line_year_plot_path: NULL
+  hist_overlay_plot_path: NULL
+  hist_faceted_plot_path: NULL
+  hist_overlay_path: NULL
+  hist_faceted_path: NULL
+  box_plot_path: NULL
+  summary_stats_data: NULL
+  heatmap_and_path: NULL
+  summary_stats_and_path: NULL
+  summary_stats_df: NULL
+  heatmap_path: NULL
+  data_table: NULL
+  box_summary_df: NULL
+  data_table_df: NULL
+  UI_summary_stats_df: NULL
+  UI_summary_stats: NULL
+---
+# Overview
+
+This report presents an extensive epidemiological analysis of multiple myeloma incidence trends across the United States from 1999 to 2021, focusing on both age group and state-level variations. Drawing on extensive surveillance data, the report provides statistical summaries, visualizations, and formal hypothesis testing to assess disparities and trends in disease burden. 
+
+This information serves as both an analytical summary and a reproducible reference for public health professionals, epidemiologists, and policymakers seeking to understand and address disparities in multiple myeloma incidence.
+
+Two datasets are used in the analysis:
+
+1. U.S. Myeloma Incidence Grouped by Year and Age Group  
+2. U.S. Myeloma Incidence Grouped by Year and State
+
+# Report Contents
+
+1. **Trends Over Time and Age Groups**  
+   - Line graphs depicting the distribution of myeloma cases by age group and by year.
+   - Histograms and faceted histograms to explore frequency distributions across age demographics.
+   - Box plots comparing the spread and central tendency of myeloma cases across age groups.
+   - Summary statistics to support descriptive insights.
+
+
+2. **Heatmap Analysis**  
+   - A heatmap visualizing the relative myeloma incidence rates by age group and year to detect clustering patterns.
+
+
+3. **State-Level Comparative Analysis**  
+   - Side-by-side box plots displaying the distribution of crude incidence rates across selected states.
+   - Summary tables and visualizations from normality and variance testing (e.g., Shapiro–Wilk, Levene’s Test).
+   - Execution of appropriate hypothesis tests (e.g., Student's t-test, Welch’s t-test, ANOVA, Kruskal–Wallis) based on data characteristics.
+   - Post-hoc Tukey HSD analysis where applicable.
+
+
+4. **Decision Tree Visual Aids**  
+   - Visual guides outlining the decision-making process for selecting appropriate statistical tests based on data assumptions.
+
+\newpage
+# **U.S. Myeloma Incidence Grouped by Year and Age Group**
+
+
+#### **Line Graph: Myeloma Cases by Age Group**
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center'}
+knitr::include_graphics(params$gg_line_age_plot_path)
+```
+\newpage
+#### **Line Graph: Myeloma Cases by Year**
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center'}
+knitr::include_graphics(params$gg_line_year_plot_path)
+```
+\newpage
+#### **Histogram: Myeloma Cases by Age Group**
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center'}
+knitr::include_graphics(params$hist_overlay_plot_path)
+```
+\newpage
+#### **Faceted Histogram: Myeloma Cases by Age Group**
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center'}
+knitr::include_graphics(params$hist_faceted_plot_path)
+```
+\newpage
+#### **Side-by-Side Box Plots: Myeloma Cases by Age Group**
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center'}
+knitr::include_graphics(params$box_plot_path)
+```
+
+#### **Summary Statistics for Myeloma Cases by Age Group**
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center'}
+#Table 2: Summary Statistics by Age Group Rate
+knitr::kable(params$summary_stats_data)
+```
+\newpage
+
+#### **Heatmap of Myeloma Incidence Rates by Age Group**
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center'}
+knitr::include_graphics(params$heatmap_and_path)
+```
+\newpage
+# **U.S. Myeloma Incidence Grouped by Year and State**
+
+#### **Side-by-Side Box Plots: Myeloma Crude Rate Distributions by Selected States**
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center',out.width='100%', out.height='100%', boxplot}
+library(dplyr)
+library(knitr)
+library(car)
+selected_states <- params$selected_states
+df_filtered <- params$state_data
+
+ggplot(df_filtered, aes(x = States, y = `Crude Rate`, fill = States)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.7) +
+  theme_minimal() +
+  labs(
+    x = "State",
+    y = "Crude Rate per 100,000"
+  )
+```
+\newpage
+### **Normality, Variance, and Statistical Testing of Myeloma Crude Rates by State**
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, shapiro}
+library(dplyr)
+library(knitr)
+library(car)
+
+selected_states <- params$selected_states
+df_filtered <- params$state_data
+
+# Perform Shapiro-Wilk test for each state on 'Crude Rate'
+shapiro_results <- df_filtered %>%
+  group_by(States) %>%
+  summarise(`Shapiro-Wilk p-value` = round(shapiro.test(`Crude Rate`)$p.value, 4))
+
+knitr::kable(shapiro_results, caption = "Shapiro-Wilk Normality Test by State")
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, levene}
+library(dplyr)
+library(knitr)
+library(car)
+levene_result <- car::leveneTest(`Crude Rate` ~ States, data = df_filtered)
+levene_table <- data.frame(
+  `F value` = round(levene_result$`F value`[1], 4),
+  `p-value` = round(levene_result$`Pr(>F)`[1], 4)
+)
+
+knitr::kable(levene_table, caption = "Levene's Test for Homogeneity of Variance")
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, main-test}
+library(dplyr)
+library(knitr)
+library(car)
+test_output <- NULL
+shapiro_vals <- df_filtered %>%
+  group_by(States) %>%
+  summarise(p = shapiro.test(`Crude Rate`)$p.value)
+
+if (length(unique(df_filtered$States)) == 2) {
+  group1 <- df_filtered %>% filter(States == selected_states[1]) %>% pull(`Crude Rate`)
+  group2 <- df_filtered %>% filter(States == selected_states[2]) %>% pull(`Crude Rate`)
+
+  if (all(shapiro_vals$p >= 0.05)) {
+    levene_p <- car::leveneTest(`Crude Rate` ~ States, data = df_filtered)$`Pr(>F)`[1]
+    if (levene_p >= 0.05) {
+      ttest <- t.test(group1, group2, var.equal = TRUE)
+      test_output <- data.frame(
+        Test = "Student's t-test",
+        `t Statistic` = round(ttest$statistic, 4),
+        `p-value` = round(ttest$p.value, 4)
+      )
+    } else {
+      ttest <- t.test(group1, group2)
+      test_output <- data.frame(
+        Test = "Welch's t-test",
+        `t Statistic` = round(ttest$statistic, 4),
+        `p-value` = round(ttest$p.value, 4)
+      )
+    }
+  } else {
+    wtest <- wilcox.test(group1, group2)
+    test_output <- data.frame(
+      Test = "Wilcoxon Rank-Sum Test",
+      `W Statistic` = round(wtest$statistic, 4),
+      `p-value` = round(wtest$p.value, 4)
+    )
+  }
+} else {
+  levene_p <- car::leveneTest(`Crude Rate` ~ States, data = df_filtered)$`Pr(>F)`[1]
+  if (all(shapiro_vals$p >= 0.05) && levene_p >= 0.05) {
+    aov_res <- aov(`Crude Rate` ~ States, data = df_filtered)
+    anova_res <- summary(aov_res)
+    test_output <- data.frame(
+      Test = "One-Way ANOVA",
+      `F value` = round(anova_res[[1]]$`F value`[1], 4),
+      `p-value` = round(anova_res[[1]]$`Pr(>F)`[1], 4)
+    )
+  } else {
+    kruskal <- kruskal.test(`Crude Rate` ~ States, data = df_filtered)
+    test_output <- data.frame(
+      Test = "Kruskal–Wallis Test",
+      `Chi-squared` = round(kruskal$statistic, 4),
+      `p-value` = round(kruskal$p.value, 4)
+    )
+  }
+}
+
+knitr::kable(test_output, caption = "Main Hypothesis Test Results")
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, tukey}
+library(dplyr)
+library(knitr)
+library(car)
+if (length(unique(df_filtered$States)) > 2 &&
+    all(shapiro_vals$p >= 0.05) &&
+    car::leveneTest(`Crude Rate` ~ States, data = df_filtered)$`Pr(>F)`[1] >= 0.05) {
+
+  tukey_result <- TukeyHSD(aov(`Crude Rate` ~ States, data = df_filtered))
+  tukey_df <- as.data.frame(tukey_result$States) %>%
+    tibble::rownames_to_column("Comparison") %>%
+    rename(
+      `Mean Difference` = diff,
+      `Lower CI` = lwr,
+      `Upper CI` = upr,
+      `Adjusted p-value` = `p adj`
+    ) %>%
+    mutate(across(where(is.numeric), round, 4))
+
+  knitr::kable(tukey_df, caption = "Tukey HSD Post-Hoc Results")
+}
+```
+\newpage
+### **Decision Trees for Statistical Test Selection Based on Normality and Variance Assumptions**
+
+
+
+#### **Two-State Decision Tree**
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, two-state-tree, fig.align='center', out.width='50%', out.height='50%'}
+library(DiagrammeR)
+library(DiagrammeRsvg)
+library(rsvg)
+
+tree2 <- grViz("
+digraph tree_2 {
+  graph [layout = dot, rankdir = TB]
+  node [shape = box, style=filled, fillcolor=white, fontname = Helvetica]
+
+  A [label = 'Normality Test (Shapiro–Wilk)']
+  B1 [label = 'Both Normal']
+  B2 [label = 'One or Both Not Normal']
+  C1 [label = 'Variance Test (Levene’s)']
+  D1 [label = 'Equal Variance']
+  D2 [label = 'Unequal Variance']
+  E1 [label = 'Student’s t-test', fillcolor = lightblue]
+  E2 [label = 'Welch’s t-test', fillcolor = lightblue]
+  E3 [label = 'Wilcoxon Rank-Sum Test', fillcolor = lightblue]
+
+  A -> B1
+  A -> B2
+  B1 -> C1
+  B2 -> E3
+  C1 -> D1
+  C1 -> D2
+  D1 -> E1
+  D2 -> E2
+}
+")
+
+# Convert to image for PDF
+tree2_svg <- export_svg(tree2)
+tree2_png <- rsvg::rsvg_png(charToRaw(tree2_svg), file = "tree2.png")
+
+knitr::include_graphics("tree2.png")
+```
+
+#### **Multi-State Decision Tree**
+
+```{r decision-tree-multi, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='50%', out.height='50%'}
+tree_multi <- grViz("
+digraph decision_tree_multi {
+  graph [layout = dot, rankdir = TB]
+  node [shape = box, style = filled, fillcolor = white, fontname = Helvetica]
+
+  A [label = 'Normality Test (Shapiro–Wilk)']
+  B1 [label = 'All Groups Normal']
+  B2 [label = 'One or More Not Normal']
+  C [label = 'Variance Test (Levene’s)']
+  D1 [label = 'Equal Variance']
+  D2 [label = 'Unequal Variance']
+  E1 [label = 'One-Way ANOVA', fillcolor = lightblue]
+  E2 [label = 'Kruskal–Wallis Test', fillcolor = lightblue]
+  F [label = 'Tukey HSD Post-hoc', fillcolor = lightblue]
+
+  A -> B1
+  A -> B2
+  B1 -> C
+  B2 -> E2
+  C -> D1
+  C -> D2
+  D1 -> E1
+  D2 -> E2
+  E1 -> F
+}
+")
+
+# Convert to image
+tree_multi_svg <- export_svg(tree_multi)
+tree_multi_png <- rsvg::rsvg_png(charToRaw(tree_multi_svg), file = "tree_multi.png")
+
+knitr::include_graphics("tree_multi.png")
+```

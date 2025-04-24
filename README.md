@@ -1,4 +1,5 @@
 # U.S. Myeloma Trends Dashboard
-For additional information, please refer to the Reference Documents folder (https://github.com/slanderson2025/US_Myeloma_Trends_Dashboard/tree/main/documentation).
+
+For additional information, please refer to the Reference Documents folder: (https://github.com/slanderson2025/US_Myeloma_Trends_Dashboard/tree/main/documentation).
 
 For specific questions, please reach out to one of the collaborators via email.

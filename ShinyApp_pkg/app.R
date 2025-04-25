@@ -1,5 +1,5 @@
 # ---- Set Working Directory ----
-#setwd('/Users/stephanie/Desktop/Brown_Courses/BHDS2010/Myeloma_Dashboard/US_Myeloma_Trends_Dashboard/ShinyApp_pkg')
+#setwd('/Your/Working/Directory/Here')
 
 # install.packages(c(
 # "shiny", "dplyr", "ggplot2", "plotly", "DT",

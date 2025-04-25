@@ -1,0 +1,12 @@
+name: US_Myeloma_Trends_2019_-_2021
+title: US_Myeloma_Trends_2019_-_2021
+username: stephanieleiningeranderson
+account: stephanieleiningeranderson
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 14589925
+bundleId: 10168266
+url: https://stephanieleiningeranderson.shinyapps.io/US_Myeloma_Trends_2019_-_2021/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

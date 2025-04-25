@@ -9,6 +9,7 @@ To download and run in your local environment, please see the files contained in
 Be sure to update your working directory in the app.R file:
 #setwd('/Set/Your/Working/Directory/Here')
 
+The data, deployment, and image folders are for maintenance purposes only.
 
 For additional information, please refer to the Reference Documents folder: https://github.com/slanderson2025/US_Myeloma_Trends_Dashboard/tree/main/documentation
 

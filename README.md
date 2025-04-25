@@ -4,6 +4,8 @@ Shiny app: http://stephanieleiningeranderson.shinyapps.io/US_Myeloma_Trends_2019
 
 This Shiny App was designed by collaborators Anne-Marie Feeney and Stephanie Leininger-Anderson.
 
+To download and run in your local environment, please see the files contained in
+
 For additional information, please refer to the Reference Documents folder: https://github.com/slanderson2025/US_Myeloma_Trends_Dashboard/tree/main/documentation
 
 For specific questions, please reach out to one of the collaborators via email.
